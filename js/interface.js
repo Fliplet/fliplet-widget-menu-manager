@@ -7,8 +7,9 @@
 
   var appId = Fliplet.Env.get('appId');
 
-  var topMenu = Fliplet.App.Settings.get('topMenu') || { id: 'pages' };
+  var topMenu = Fliplet.App.Settings.get('topMenu') || { id: 'pages', style: 'default' };
   var $appMenu = $('#app-menu');
+  var $styleMenu = $('#style-menu');
 
   var currentDataSource;
 
@@ -29,8 +30,10 @@
       dataSources.forEach(function (dataSource) {
         addMenu(dataSource);
       });
+      $('#select-menu').change().prop('disabled', '');
 
-      $appMenu.val(topMenu.id).change();
+      $appMenu.val(topMenu.id).change().prop('disabled', '');
+      $styleMenu.val(topMenu.style).change().prop('disabled', '');
     });
 
   // Listeners
@@ -100,8 +103,6 @@
     });
 
   $('#select-menu').on('change', function onMenuChange() {
-    updateSelectMenuText();
-
     // Change visible links
     var menuId = $(this).val();
 
@@ -139,9 +140,10 @@
     $('#menu-manager-control').addClass('active');
   });
 
-  $appMenu.on('change', function () {
-    var selectedText = $(this).find('option:selected').text();
-    $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
+  $(document).on('change', '.hidden-select', function(){
+    var selectedValue = $(this).val();
+    var selectedText = $(this).find("option:selected").text();
+    $(this).parents('.select-proxy-display').find('.select-value-proxy').text(selectedText);
   });
 
   Fliplet.Widget.onSaveRequest(function () {
@@ -158,11 +160,13 @@
 
   function saveSettings() {
     topMenu.id = $appMenu.val();
+    topMenu.style = $styleMenu.val();
+    topMenu.template = $("#style-" + topMenu.style).html();
+
     Fliplet.App.Settings.set({ topMenu: topMenu }).then(function () {
+      showSuccessMessage();
       Fliplet.Studio.emit('reload-page-preview');
     });
-
-    showSuccessMessage();
   }
 
   function saveManager() {
@@ -175,9 +179,8 @@
 
     // Update data source if name was changed
     if (getSelectedMenuName() !== newMenuName) {
-      $("#select-menu option:selected").text(newMenuName);
-      updateSelectMenuText();
-      $appMenu.find("option[value='" + currentDataSource.id + "']").text(newMenuName).change();
+      $("#select-menu option:selected").text(newMenuName).parent().change();
+      $appMenu.find("option[value='" + currentDataSource.id + "']").text(newMenuName).parent().change();
 
       var updateOptions = {
         id: currentDataSource.id,
@@ -306,10 +309,5 @@
 
   function setMenuName(name) {
     return $('#menu-name').val(name);
-  }
-
-  function updateSelectMenuText() {
-    var selectedText = $('#select-menu').find('option:selected').text();
-    $('#select-menu').parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
   }
 })();
