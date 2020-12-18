@@ -329,21 +329,14 @@
           if (menu.instances.length) {
             currentMenu = menu;
 
-            if (menu.hasInterface) {
-              $('[data-settings]').removeClass('hidden');
-            }
-
-            latestVersionMenu = menu
-            return;
+            return latestVersionMenu = menu;
           }
         }
       })
 
-      // debugger;
 
-
-     if (!latestVersionMenu) {
-       arr.reduce(function(acc, current) {
+      if (!latestVersionMenu) {
+        arr.reduce(function(acc, current) {
           if (previousMenu && previousMenu.package.includes(current.package)) {
             previousMenu.instances = [];
             latestVersionMenu = previousMenu;
@@ -353,10 +346,10 @@
             latestVersionMenu = (acc.version > current.version) ? acc: current
             return;
           }
- 
+
           return current;
-       }, [])
-     }
+        }, [])
+      }
 
       if (!latestVersionMenu) {
         arr.find(function(field) {
@@ -374,10 +367,9 @@
   function loadCustomMenuWidgets() {
     $('.menu-styles-wrapper').addClass('loading');
     return fetchCustomMenuWidgets().then(function(menus) {
-      var sortedMenus;
+      var sortedMenus = sortCustomMenus(menus);
+      
       $customMenus.html('');
-
-      sortedMenus = sortCustomMenus(menus);
       customMenus = sortedMenus;
 
       sortedMenus.forEach(function(menu) {
