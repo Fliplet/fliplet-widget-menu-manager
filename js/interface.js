@@ -24,6 +24,16 @@
   var menuDataSources = [];
   var customMenus = [];
   var customMenuLoadingPromise;
+  var previousMenu;
+  var defaultMenuPackages = [
+    'com.fliplet.menu.bottom-bar',
+    'com.fliplet.menu.expandable',
+    'com.fliplet.menu.eversheds',
+    'com.fliplet.menu.default',
+    'com.fliplet.menu.push-in',
+    'com.fliplet.menu.slide-in',
+    'com.fliplet.menu.sequential'
+  ];
 
   var isFilePickerClosed = false;
 
@@ -235,6 +245,8 @@
       $('.menu-styles-wrapper').addClass('loading');
       $('.radio_' + widgetId).prop('checked', true);
 
+      previousMenu = _.cloneDeep(currentMenu);
+
       // First, remove any existing menu widgetInstance
       Promise.all(customMenus.map(function(menu) {
         return Promise.all(menu.instances.map(function(instance) {
@@ -297,6 +309,7 @@
     return Fliplet.API.request({
       url: [
         'v1/widgets?include_instances=true&tags=type:menu',
+        '&include_all_versions=true',
         '&appId=' + Fliplet.Env.get('appId'),
         '&organizationId=' + (Fliplet.Env.get('organizationId') || '')
       ].join('')
@@ -305,23 +318,60 @@
     });
   }
 
+  function sortCustomMenus(menus) {
+    var result = [];
+    defaultMenuPackages.forEach(function(item) {
+      var packageTypeArray = [];
+      var latestVersionMenu;
+      var previousVersion;
+
+      menus.forEach(function(menu) {
+        if (menu.package.includes(item)) {
+          packageTypeArray.push(menu);
+
+          if (menu.instances.length) {
+            currentMenu = menu;
+            return latestVersionMenu = menu;
+          }
+        }
+      })
+
+      if (previousMenu && previousMenu.package.includes(item)) {
+        previousMenu.instances = [];
+        latestVersionMenu = previousMenu;
+        result.push(latestVersionMenu);
+        return;
+      }
+      
+      packageTypeArray.forEach(function(menu) {
+        if (previousVersion && previousVersion.version !== menu.version) {
+          latestVersionMenu = (previousVersion.version > menu.version) ? previousVersion : menu;
+          return;
+        } else {
+          previousVersion = menu;
+        }
+
+        if(!latestVersionMenu) {
+          latestVersionMenu = menu;
+        }
+      })
+
+      result.push(latestVersionMenu);
+    })
+    return result;
+  }
+
   function loadCustomMenuWidgets() {
     $('.menu-styles-wrapper').addClass('loading');
     return fetchCustomMenuWidgets().then(function(menus) {
-      customMenus = menus;
+      var sortedMenus = sortCustomMenus(menus);
+      
       $customMenus.html('');
+      customMenus = sortedMenus;
 
-      menus.forEach(function(menu) {
+      sortedMenus.forEach(function(menu) {
         if (_.isEmpty(menu.settings)) {
           return;
-        }
-
-        if (menu.instances.length) {
-          currentMenu = menu.instances[0];
-
-          if (menu.hasInterface) {
-            $('[data-settings]').removeClass('hidden');
-          }
         }
 
         $customMenus.append(templates.menuWidget({
@@ -335,6 +385,9 @@
       });
 
       $('.menu-styles-wrapper').removeClass('loading');
+      if (previousMenu) {
+        $('.radio_' + previousMenu.id).prop('checked', false);
+      }
     });
   }
 
