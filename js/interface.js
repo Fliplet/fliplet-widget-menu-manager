@@ -337,6 +337,8 @@
       if (previousMenu && previousMenu.package.includes(item)) {
         previousMenu.instances = [];
         latestVersionMenu = previousMenu;
+        result.push(latestVersionMenu);
+        return;
       }
       
       arr.forEach(function(menu) {
