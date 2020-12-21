@@ -32,7 +32,7 @@
     'com.fliplet.menu.default',
     'com.fliplet.menu.push-in',
     'com.fliplet.menu.slide-in',
-    'com.fliplet.menu.sequential',
+    'com.fliplet.menu.sequential'
   ];
 
   var isFilePickerClosed = false;
@@ -244,6 +244,7 @@
       var widgetId = $el.data('widget-id');
       $('.menu-styles-wrapper').addClass('loading');
       $('.radio_' + widgetId).prop('checked', true);
+
       previousMenu = _.cloneDeep(currentMenu);
       // First, remove any existing menu widgetInstance
       Promise.all(customMenus.map(function(menu) {
@@ -319,13 +320,13 @@
   function sortCustomMenus(menus) {
     var result = [];
     defaultMenuPackages.forEach(function(item) {
-      var arr = [];
+      var packageTypeArray = [];
       var latestVersionMenu;
       var previousVersion;
 
       menus.forEach(function(menu) {
         if (menu.package.includes(item)) {
-          arr.push(menu);
+          packageTypeArray.push(menu);
 
           if (menu.instances.length) {
             currentMenu = menu;
@@ -341,7 +342,7 @@
         return;
       }
       
-      arr.forEach(function(menu) {
+      packageTypeArray.forEach(function(menu) {
         if (previousVersion && previousVersion.version !== menu.version) {
           latestVersionMenu = (previousVersion.version > menu.version) ? previousVersion : menu;
           return;
