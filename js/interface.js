@@ -320,6 +320,7 @@
 
   function sortCustomMenus(menus) {
     var result = [];
+
     defaultMenuPackages.forEach(function(item) {
       var packageTypeArray = [];
       var latestVersionMenu;
@@ -385,6 +386,7 @@
       });
 
       $('.menu-styles-wrapper').removeClass('loading');
+
       if (previousMenu) {
         $('.radio_' + previousMenu.id).prop('checked', false);
       }
