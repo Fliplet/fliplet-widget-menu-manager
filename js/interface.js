@@ -383,7 +383,9 @@
       });
 
       $('.menu-styles-wrapper').removeClass('loading');
-      $('.radio_' + previousMenu.id).prop('checked', false);
+      if (previousMenu) {
+        $('.radio_' + previousMenu.id).prop('checked', false);
+      }
     });
   }
 
