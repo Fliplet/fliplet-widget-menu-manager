@@ -321,6 +321,7 @@
     defaultMenuPackages.forEach(function(item) {
       var arr = [];
       var latestVersionMenu;
+      var previousVersion;
 
       menus.forEach(function(menu) {
         if (menu.package.includes(item)) {
@@ -328,36 +329,28 @@
 
           if (menu.instances.length) {
             currentMenu = menu;
-
-            return latestVersionMenu = menu;
+            latestVersionMenu = menu
           }
         }
       })
 
-
-      if (!latestVersionMenu) {
-        arr.reduce(function(acc, current) {
-          if (previousMenu && previousMenu.package.includes(current.package)) {
-            previousMenu.instances = [];
-            latestVersionMenu = previousMenu;
-          }
-
-          if (acc && acc.version !== current.version) {
-            latestVersionMenu = (acc.version > current.version) ? acc: current
-            return;
-          }
-
-          return current;
-        }, [])
+      if (previousMenu && previousMenu.package.includes(item)) {
+        previousMenu.instances = [];
+        latestVersionMenu = previousMenu;
       }
 
-      if (!latestVersionMenu) {
-        arr.find(function(field) {
-          if (field.package === item) {
-            latestVersionMenu = field
-          }
-        })
-      }
+      arr.forEach(function(menu) {
+        if (previousVersion && previousVersion.version !== menu.version) {
+          latestVersionMenu = (previousVersion.version > menu.version) ? previousVersion : menu;
+          return;
+        } else {
+          previousVersion = menu;
+        }
+
+        if (!latestVersionMenu) {
+          latestVersionMenu = menu;
+        }
+      })
 
       result.push(latestVersionMenu);
     })
