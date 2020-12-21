@@ -244,8 +244,8 @@
       var widgetId = $el.data('widget-id');
       $('.menu-styles-wrapper').addClass('loading');
       $('.radio_' + widgetId).prop('checked', true);
-
       previousMenu = _.cloneDeep(currentMenu);
+
       // First, remove any existing menu widgetInstance
       Promise.all(customMenus.map(function(menu) {
         return Promise.all(menu.instances.map(function(instance) {
