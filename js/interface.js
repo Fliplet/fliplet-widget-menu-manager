@@ -335,7 +335,7 @@
             return latestVersionMenu = menu;
           }
         }
-      })
+      });
 
       if (previousMenu && previousMenu.package.includes(item)) {
         previousMenu.instances = [];
@@ -355,10 +355,10 @@
         if(!latestVersionMenu) {
           latestVersionMenu = menu;
         }
-      })
+      });
 
       result.push(latestVersionMenu);
-    })
+    });
     return result;
   }
 
