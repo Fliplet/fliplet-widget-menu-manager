@@ -28,7 +28,6 @@
   var defaultMenuPackages = [
     'com.fliplet.menu.bottom-bar',
     'com.fliplet.menu.expandable',
-    'com.fliplet.menu.eversheds',
     'com.fliplet.menu.default',
     'com.fliplet.menu.push-in',
     'com.fliplet.menu.slide-in',
