@@ -167,6 +167,7 @@
       if (menuId === 'pages' || menuId === '') {
         $('#menu-links').hide();
         currentDataSource = null;
+
         return;
       }
 
@@ -179,6 +180,7 @@
 
         if (!dataSource) {
           console.warn('Menu data source not found');
+
           return;
         }
 
@@ -215,6 +217,7 @@
           if (!menusPromises.hasOwnProperty(key)) continue;
 
           var obj = menusPromises[key];
+
           for (var prop in obj) {
             // skip loop if the property is from prototype
             if (!obj.hasOwnProperty(prop)) continue;
@@ -223,15 +226,19 @@
           }
         }
       }
+
       if (!currentProvider) { return; }
+
       currentProvider.forwardCancelRequest();
     });
 
     // Handler to change the menu
     $('body').on('click', '[data-widget-id]', function(event) {
       event.preventDefault();
+
       var $el = $(this);
       var widgetId = $el.data('widget-id');
+
       $('.menu-styles-wrapper').addClass('loading');
       $('.radio_' + widgetId).prop('checked', true);
 
@@ -254,6 +261,7 @@
         });
       }).then(function() {
         Fliplet.Studio.emit('reload-page-preview');
+
         return loadCustomMenuWidgets();
       });
     })
@@ -278,6 +286,7 @@
         var currentItem = _.find(currentMenuItems, function(item) {
           return item.id === itemId;
         });
+
         initIconProvider(currentItem);
       })
       .on('click', '.remove-icon', function() {
@@ -287,6 +296,7 @@
           return item.id === itemId;
         });
         var iconBak = currentItem.data.icon;
+
         currentItem.data.icon = undefined;
         $parent.removeClass('icon-selected');
         $parent.find('.selected-icon').removeClass(iconBak);
@@ -307,6 +317,7 @@
 
   function loadCustomMenuWidgets() {
     $('.menu-styles-wrapper').addClass('loading');
+
     return fetchCustomMenuWidgets().then(function(menus) {
       customMenus = menus;
       $customMenus.html('');
@@ -367,6 +378,7 @@
     currentProvider.then(function(data) {
       if (data.data) {
         var previousIconClass = row.data.icon;
+
         row.data.icon = data && typeof data.data.icon !== 'undefined' ? data.data.icon : '';
         $('[data-id="' + row.id + '"] .icon-selection-holder').addClass('icon-selected');
         $('[data-id="' + row.id + '"] .selected-icon').removeClass(previousIconClass).addClass(data.data.icon);
@@ -377,6 +389,7 @@
         text: 'Save'
       });
       currentProvider = null;
+
       return Promise.resolve();
     });
   }
@@ -386,6 +399,7 @@
 
     if (!currentDataSource) {
       topMenu.id = $appMenu.val();
+
       return Fliplet.App.Settings.set({
         topMenu: topMenu
       }).then(function() {
@@ -414,10 +428,12 @@
       return Fliplet.DataSources.connect(currentDataSource.id)
         .then(function(source) {
           mergeMenuEntries(menuDataEntries, sortedMenuItemIds);
+
           return source.replaceWith(menuDataEntries);
         });
     }).then(function() {
       topMenu.id = $appMenu.val();
+
       return Fliplet.App.Settings.set({
         topMenu: topMenu
       });
@@ -502,6 +518,7 @@
                   },
                   id: page.id
                 };
+
                 addLink(dataSource.id, newRow);
               });
             });
@@ -532,6 +549,7 @@
           // sets up new provider
           $('[data-id="' + menuItemId + '"] .link').html('');
           initLinkProvider(menuItem, currentDataSource.id);
+
           return true;
         }
       });
@@ -593,6 +611,7 @@
 
     linkActionProvider.then(function(data) {
       row.data.action = data && data.data.action !== 'none' ? data.data : null;
+
       return Promise.resolve();
     });
 
@@ -659,6 +678,7 @@
         $('#panel-holder').show();
         $appMenu.val(topMenu.id).change();
       });
+
     return customMenuLoadingPromise;
   }
 
