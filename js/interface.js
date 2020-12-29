@@ -341,7 +341,9 @@
 
           if (menu.instances.length) {
             currentMenu = menu;
-            return latestVersionMenu = menu;
+            latestVersionMenu = menu;
+
+            return;
           }
         }
       });
@@ -350,24 +352,28 @@
         previousMenu.instances = [];
         latestVersionMenu = previousMenu;
         result.push(latestVersionMenu);
+
         return;
       }
-      
+
       packageTypeArray.forEach(function(menu) {
         if (previousVersion && previousVersion.version !== menu.version) {
           latestVersionMenu = (previousVersion.version > menu.version) ? previousVersion : menu;
+
           return;
-        } else {
-          previousVersion = menu;
         }
 
-        if(!latestVersionMenu) {
+        previousVersion = menu;
+
+
+        if (!latestVersionMenu) {
           latestVersionMenu = menu;
         }
       });
 
       result.push(latestVersionMenu);
     });
+
     return result;
   }
 
