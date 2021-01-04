@@ -7,6 +7,7 @@
   };
 
   var appId = Fliplet.Env.get('appId');
+  var organizationId = Fliplet.Env.get('organizationId');
 
   var topMenu = Fliplet.App.Settings.get('topMenu') || {
     id: 'pages'
@@ -25,14 +26,6 @@
   var customMenus = [];
   var customMenuLoadingPromise;
   var previousMenu;
-  var defaultMenuPackages = [
-    'com.fliplet.menu.bottom-bar',
-    'com.fliplet.menu.expandable',
-    'com.fliplet.menu.default',
-    'com.fliplet.menu.push-in',
-    'com.fliplet.menu.slide-in',
-    'com.fliplet.menu.sequential'
-  ];
 
   var isFilePickerClosed = false;
 
@@ -320,35 +313,66 @@
         'v1/widgets?include_instances=true&tags=type:menu',
         '&include_all_versions=true',
         '&appId=' + Fliplet.Env.get('appId'),
-        '&organizationId=' + (Fliplet.Env.get('organizationId') || '')
+        '&organizationId=' + (organizationId || '')
       ].join('')
     }).then(function(response) {
       return Promise.resolve(response.widgets);
     });
   }
 
+  function hasInstance(data) {
+    return data.find(function(menu) {
+      if (menu.instances.length) {
+        currentMenu = menu;
+
+        return menu;
+      }
+    });
+  }
+
+  function sortByVersion(data, latestVersionMenu) {
+    var previousVersion;
+
+    data.forEach(function(menu) {
+      if (previousVersion && previousVersion.version !== menu.version) {
+        latestVersionMenu = (previousVersion.version > menu.version) ? previousVersion : menu;
+
+        return;
+      }
+
+      previousVersion = menu;
+
+      if (!latestVersionMenu) {
+        latestVersionMenu = menu;
+      }
+    });
+
+    return latestVersionMenu;
+  }
+
   function sortCustomMenus(menus) {
     var result = [];
+    var defaultMenus = [];
 
-    defaultMenuPackages.forEach(function(item) {
-      var packageTypeArray = [];
+    menus.filter(function(item) {
+      if (item.organizationId !== organizationId) {
+        defaultMenus.push(item);
+      }
+    });
+
+    defaultMenus.forEach(function(item) {
+      var arrayOfPackages = [];
       var latestVersionMenu;
-      var previousVersion;
 
-      menus.forEach(function(menu) {
-        if (menu.package.includes(item)) {
-          packageTypeArray.push(menu);
-
-          if (menu.instances.length) {
-            currentMenu = menu;
-            latestVersionMenu = menu;
-
-            return;
-          }
+      menus.filter(function(menu) {
+        if (menu.package.includes(item.package)) {
+          arrayOfPackages.push(menu);
         }
       });
 
-      if (previousMenu && previousMenu.package.includes(item)) {
+      latestVersionMenu = hasInstance(arrayOfPackages);
+
+      if (previousMenu && previousMenu.package.includes(item.package)) {
         previousMenu.instances = [];
         latestVersionMenu = previousMenu;
         result.push(latestVersionMenu);
@@ -356,20 +380,7 @@
         return;
       }
 
-      packageTypeArray.forEach(function(menu) {
-        if (previousVersion && previousVersion.version !== menu.version) {
-          latestVersionMenu = (previousVersion.version > menu.version) ? previousVersion : menu;
-
-          return;
-        }
-
-        previousVersion = menu;
-
-
-        if (!latestVersionMenu) {
-          latestVersionMenu = menu;
-        }
-      });
+      latestVersionMenu = sortByVersion(arrayOfPackages, latestVersionMenu);
 
       result.push(latestVersionMenu);
     });
