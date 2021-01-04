@@ -369,10 +369,10 @@
       });
 
       if (arrayOfPackages.length) {
-        currentMenu = getActiveMenu(arrayOfPackages);
+        latestVersionMenu = getActiveMenu(arrayOfPackages);
 
-        if (currentMenu) {
-          latestVersionMenu = currentMenu;
+        if (latestVersionMenu) {
+          currentMenu = latestVersionMenu;
         }
       }
 
