@@ -351,6 +351,7 @@
   function generateMenuList(menus) {
     var result = [];
     var defaultMenus = [];
+    var hasActiveMenu = false;
 
     menus.filter(function(item) {
       if (item.organizationId !== organizationId) {
@@ -368,11 +369,12 @@
         }
       });
 
-      if (arrayOfPackages.length) {
+      if (arrayOfPackages.length && !hasActiveMenu) {
         latestVersionMenu = getActiveMenu(arrayOfPackages);
 
         if (latestVersionMenu) {
           currentMenu = latestVersionMenu;
+          hasActiveMenu = true;
         }
       }
 
