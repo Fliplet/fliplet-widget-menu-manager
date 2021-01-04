@@ -320,11 +320,9 @@
     });
   }
 
-  function hasInstance(data) {
+  function getActiveMenu(data) {
     return data.find(function(menu) {
       if (menu.instances.length) {
-        currentMenu = menu;
-
         return menu;
       }
     });
@@ -350,7 +348,7 @@
     return latestVersionMenu;
   }
 
-  function sortCustomMenus(menus) {
+  function generateMenuList(menus) {
     var result = [];
     var defaultMenus = [];
 
@@ -370,7 +368,14 @@
         }
       });
 
-      latestVersionMenu = hasInstance(arrayOfPackages);
+      if (arrayOfPackages.length) {
+        currentMenu = getActiveMenu(arrayOfPackages);
+
+        if (currentMenu) {
+          latestVersionMenu = currentMenu;
+        }
+      }
+
 
       if (previousMenu && previousMenu.package.includes(item.package)) {
         previousMenu.instances = [];
@@ -392,7 +397,7 @@
     $('.menu-styles-wrapper').addClass('loading');
 
     return fetchCustomMenuWidgets().then(function(menus) {
-      var sortedMenus = sortCustomMenus(menus);
+      var sortedMenus = generateMenuList(menus);
 
       $customMenus.html('');
       customMenus = sortedMenus;
