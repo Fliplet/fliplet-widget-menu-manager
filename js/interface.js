@@ -320,14 +320,6 @@
     });
   }
 
-  function getActiveMenu(data) {
-    return data.find(function(menu) {
-      if (menu.instances.length) {
-        return menu;
-      }
-    });
-  }
-
   function sortByVersion(data, latestVersionMenu) {
     var previousVersion;
 
@@ -350,27 +342,29 @@
 
   function generateMenuList(menus) {
     var result = [];
-    var defaultMenus = [];
     var hasActiveMenu = false;
 
-    menus.filter(function(item) {
+    var defaultMenus = menus.filter(function(item) {
       if (item.organizationId !== organizationId) {
-        defaultMenus.push(item);
+        return item;
       }
     });
 
     defaultMenus.forEach(function(item) {
-      var arrayOfPackages = [];
       var latestVersionMenu;
 
-      menus.filter(function(menu) {
+      var menusByPackages = menus.filter(function(menu) {
         if (menu.package.includes(item.package)) {
-          arrayOfPackages.push(menu);
+          return menu;
         }
       });
 
-      if (arrayOfPackages.length && !hasActiveMenu) {
-        latestVersionMenu = getActiveMenu(arrayOfPackages);
+      if (menusByPackages.length && !hasActiveMenu) {
+        latestVersionMenu = menusByPackages.find(function(menu) {
+          if (menu.instances.length) {
+            return menu;
+          }
+        });
 
         if (latestVersionMenu) {
           currentMenu = latestVersionMenu;
@@ -386,7 +380,7 @@
         return;
       }
 
-      latestVersionMenu = sortByVersion(arrayOfPackages, latestVersionMenu);
+      latestVersionMenu = sortByVersion(menusByPackages, latestVersionMenu);
 
       result.push(latestVersionMenu);
     });
