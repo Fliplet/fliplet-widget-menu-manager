@@ -344,26 +344,20 @@
     var result = [];
     var hasActiveMenu = false;
 
-    var defaultMenus = menus.filter(function(item) {
-      if (item.organizationId !== organizationId) {
-        return item;
-      }
+    var systemMenus = menus.filter(function(item) {
+      return item.organizationId !== organizationId;
     });
 
-    defaultMenus.forEach(function(item) {
+    systemMenus.forEach(function(item) {
       var latestVersionMenu;
 
-      var menusByPackages = menus.filter(function(menu) {
-        if (menu.package.includes(item.package)) {
-          return menu;
-        }
+      var organizationMenus = menus.filter(function(menu) {
+        return menu.package.includes(item.package);
       });
 
-      if (menusByPackages.length && !hasActiveMenu) {
-        latestVersionMenu = menusByPackages.find(function(menu) {
-          if (menu.instances.length) {
-            return menu;
-          }
+      if (organizationMenus.length && !hasActiveMenu) {
+        latestVersionMenu = organizationMenus.find(function(menu) {
+          return menu.instances.length > 0;
         });
 
         if (latestVersionMenu) {
@@ -380,7 +374,7 @@
         return;
       }
 
-      latestVersionMenu = sortByVersion(menusByPackages, latestVersionMenu);
+      latestVersionMenu = sortByVersion(organizationMenus, latestVersionMenu);
 
       result.push(latestVersionMenu);
     });
