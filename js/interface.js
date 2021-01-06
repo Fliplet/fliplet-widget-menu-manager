@@ -276,7 +276,7 @@
           return;
         }
 
-        currentProvider = Fliplet.Widget.open(currentMenu.id);
+        currentProvider = Fliplet.Widget.open(currentMenu.instances[0].id);
         setWidgetControls('settings');
 
         currentProvider.then(function() {
@@ -320,10 +320,18 @@
     });
   }
 
+  /**
+   * Function to filter organizationMenus by version.
+   * @param {array} data - array of organizationMenus
+   * @param {object} latestVersionMenu - current active menu
+   * @returns {object}
+   */
+
   function sortByVersion(data, latestVersionMenu) {
     var previousVersion;
 
     data.forEach(function(menu) {
+      // Compare each record with the previous one by version to find the newest version.
       if (previousVersion && previousVersion.version !== menu.version) {
         latestVersionMenu = (previousVersion.version > menu.version) ? previousVersion : menu;
 
@@ -332,6 +340,7 @@
 
       previousVersion = menu;
 
+      // Always write the system menu first, then if iteration finds the newest version, latestVersionMenu will be overwritten.
       if (!latestVersionMenu) {
         latestVersionMenu = menu;
       }
@@ -340,22 +349,32 @@
     return latestVersionMenu;
   }
 
+  /**
+   * Function which filtering current array of menus by version and created a new one.
+   * @param {array} menus - array of menus which comes from api
+   * @returns {array}
+   */
+
   function generateMenuList(menus) {
     var result = [];
     var hasActiveMenu = false;
 
+    // Filtering current menus array by organizationId to create array of system menus.
     var systemMenus = menus.filter(function(item) {
       return item.organizationId !== organizationId;
     });
 
+    // Cycle iterating the array of system menus to fulfill the necessary conditions.
     systemMenus.forEach(function(item) {
       var latestVersionMenu;
 
+      // Creating an array of all custom entries for one package of the system menu.
       var organizationMenus = menus.filter(function(menu) {
         return menu.package.includes(item.package);
       });
 
       if (organizationMenus.length && !hasActiveMenu) {
+        // Find the currently active menu.
         latestVersionMenu = organizationMenus.find(function(menu) {
           return menu.instances.length > 0;
         });
@@ -367,6 +386,8 @@
       }
 
       if (previousMenu && previousMenu.package.includes(item.package)) {
+        // Keeping the previous menu and deleting the instance if the user chose a different menu type.
+        // Implemented to keep the previous version of the user menu.
         previousMenu.instances = [];
         latestVersionMenu = previousMenu;
         result.push(latestVersionMenu);
@@ -374,6 +395,7 @@
         return;
       }
 
+      // Sorting custom menus by version
       latestVersionMenu = sortByVersion(organizationMenus, latestVersionMenu);
 
       result.push(latestVersionMenu);
@@ -394,6 +416,10 @@
       sortedMenus.forEach(function(menu) {
         if (_.isEmpty(menu.settings)) {
           return;
+        }
+
+        if (menu.instances.length && menu.hasInterface) {
+          $('[data-settings]').removeClass('hidden');
         }
 
         $customMenus.append(templates.menuWidget({
