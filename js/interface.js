@@ -322,9 +322,9 @@
 
   /**
    * Function to filter organizationMenus by version.
-   * @param {array} data - array of organizationMenus
-   * @param {object} latestVersionMenu - current active menu
-   * @returns {object}
+   * @param {Array} data - array of organizationMenus
+   * @param {Object} latestVersionMenu - current active menu
+   * @returns {Object} latestVersionMenu - object which contains the latest version of current menu package type
    */
 
   function sortByVersion(data, latestVersionMenu) {
@@ -351,8 +351,8 @@
 
   /**
    * Function which filtering current array of menus by version and created a new one.
-   * @param {array} menus - array of menus which comes from api
-   * @returns {array}
+   * @param {Array} menus - array of menus which comes from api
+   * @returns {Array} result - new filtered array by version
    */
 
   function generateMenuList(menus) {
