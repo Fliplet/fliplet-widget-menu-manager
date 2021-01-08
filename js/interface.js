@@ -350,32 +350,32 @@
   }
 
   /**
-   * Function which filtering current array of menus by version and created a new one.
-   * @param {Array} menus - array of menus which comes from api
-   * @returns {Array} result - new filtered array by version
+   * Creates a list of menu widgets to be displayed based on versions and current usage
+   * @param {Array} menus - List of menu widgets
+   * @returns {Array} List of menu widgets to be displayed based on versions and current usage
    */
 
   function generateMenuList(menus) {
     var result = [];
     var hasActiveMenu = false;
 
-    // Filtering current menus array by organizationId to create array of system menus.
+    // System menus don't have organizationId
     var systemMenus = menus.filter(function(item) {
-      return item.organizationId !== organizationId;
+      return !item.organizationId;
     });
 
     // Cycle iterating the array of system menus to fulfill the necessary conditions.
     systemMenus.forEach(function(item) {
       var latestVersionMenu;
 
-      // Creating an array of all custom entries for one package of the system menu.
-      var organizationMenus = menus.filter(function(menu) {
+      // Creating an array of one type of menu.
+      var packageTypeMenus = menus.filter(function(menu) {
         return menu.package.includes(item.package);
       });
 
-      if (organizationMenus.length && !hasActiveMenu) {
+      if (packageTypeMenus.length && !hasActiveMenu) {
         // Find the currently active menu.
-        latestVersionMenu = organizationMenus.find(function(menu) {
+        latestVersionMenu = packageTypeMenus.find(function(menu) {
           return menu.instances.length > 0;
         });
 
@@ -396,7 +396,7 @@
       }
 
       // Sorting custom menus by version
-      latestVersionMenu = sortByVersion(organizationMenus, latestVersionMenu);
+      latestVersionMenu = sortByVersion(packageTypeMenus, latestVersionMenu);
 
       result.push(latestVersionMenu);
     });
