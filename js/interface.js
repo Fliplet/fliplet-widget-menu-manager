@@ -370,8 +370,12 @@
 
       // Creating an array of one type of menu.
       var packageTypeMenus = menus.filter(function(menu) {
-        return menu.package.includes(item.package);
+        return menu.organizationId && menu.package.includes(item.package);
       });
+
+      if (!packageTypeMenus.length) {
+        packageTypeMenus.push(item);
+      }
 
       if (packageTypeMenus.length && !hasActiveMenu) {
         // Find the currently active menu.
