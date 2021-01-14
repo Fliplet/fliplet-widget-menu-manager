@@ -367,12 +367,12 @@
     // Cycle iterating the array of system menus to fulfill the necessary conditions.
     systemMenus.forEach(function(item) {
       var latestVersionMenu;
-      var splitSystemMenuArray = item.package.split('.');
 
       // Creating an array of one type of menu.
       var packageTypeMenus = menus.filter(function(menu) {
         if (menu.package) {
           var splitMenuArray = menu.package.split('.');
+          var splitSystemMenuArray = item.package.split('.');
 
           return splitMenuArray.length === splitSystemMenuArray.length && splitMenuArray[3].includes(splitSystemMenuArray[3]);
         }
