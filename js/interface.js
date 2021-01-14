@@ -371,10 +371,10 @@
       // Creating an array of one type of menu.
       var packageTypeMenus = menus.filter(function(menu) {
         if (menu.package) {
-          var splitMenuArray = menu.package.split('.');
-          var splitSystemMenuArray = item.package.split('.');
+          var menuPackageName = menu.package.split('.');
+          var systemMenuPackageName = item.package.split('.');
 
-          return splitMenuArray.length === splitSystemMenuArray.length && splitMenuArray[3].includes(splitSystemMenuArray[3]);
+          return menuPackageName.length === systemMenuPackageName.length && menuPackageName[3].includes(systemMenuPackageName[3]);
         }
       });
 
