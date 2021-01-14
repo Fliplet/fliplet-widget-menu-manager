@@ -370,12 +370,13 @@
 
       // Creating an array of one type of menu.
       var packageTypeMenus = menus.filter(function(menu) {
-        return menu.organizationId && menu.package.includes(item.package);
-      });
+        if (menu.package) {
+          var splitMenuArray = menu.package.split('.');
+          var splitSystemMenuArray = item.package.split('.');
 
-      if (!packageTypeMenus.length) {
-        packageTypeMenus.push(item);
-      }
+          return splitMenuArray.length === splitSystemMenuArray.length && splitMenuArray[3].includes(splitSystemMenuArray[3]);
+        }
+      });
 
       if (packageTypeMenus.length && !hasActiveMenu) {
         // Find the currently active menu.
