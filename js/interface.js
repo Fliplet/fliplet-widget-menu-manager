@@ -374,7 +374,6 @@
           var menuPackageName = menu.package.split('.').pop();
           var systemMenuPackageName = item.package.split('.').pop();
 
-
           return menuPackageName.includes(systemMenuPackageName);
         }
       });
