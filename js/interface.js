@@ -327,7 +327,7 @@
    * @returns {Object} latestVersionMenu - object which contains the latest version of current menu package type
    */
 
-  function sortByVersion(data, latestVersionMenu) {
+  function getLatestMenuVersion(data, latestVersionMenu) {
     var previousVersion;
 
     data.forEach(function(menu) {
@@ -336,7 +336,7 @@
 
       // Compare each record with the previous one by version to find the newest version.
       if (previousVersion && formattedPreviousMenuVersion !== formattedMenuVersion) {
-        latestVersionMenu = (formattedPreviousMenuVersion > formattedMenuVersion) ? previousVersion : undefined;
+        latestVersionMenu = (formattedPreviousMenuVersion > formattedMenuVersion) ? previousVersion : null;
       }
 
       previousVersion = menu;
@@ -393,7 +393,7 @@
         }
 
         // Sorting custom menus by version
-        latestVersionMenu = sortByVersion(packageTypeMenus, latestVersionMenu);
+        latestVersionMenu = getLatestMenuVersion(packageTypeMenus, latestVersionMenu);
 
         result.push(latestVersionMenu);
       }
