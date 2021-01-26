@@ -322,13 +322,12 @@
   /**
    * Function to filter organizationMenus by version.
    * @param {Array} data - array of organizationMenus
-   * @param {Object} latestVersionMenu - current active menu
    * @returns {Object} latestVersionMenu - object which contains the latest version of current menu package type
    */
 
   function getLatestMenuVersion(data) {
     var previousVersion;
-    var currentVersion;
+    var latestVersionMenu;
 
     data.forEach(function(menu) {
       var formattedMenuVersion = menu.version.split('.');
@@ -339,11 +338,11 @@
           if (+formattedMenuVersion[index] === +formattedPreviousMenuVersion[index]) break;
 
           if (+formattedMenuVersion[index] > +formattedPreviousMenuVersion[index]) {
-            currentVersion = menu;
+            latestVersionMenu = menu;
           }
 
           if (+formattedMenuVersion[index] < +formattedPreviousMenuVersion[index]) {
-            currentVersion = previousVersion;
+            latestVersionMenu = previousVersion;
           }
 
           if (currentMenu) return;
@@ -352,12 +351,12 @@
 
       previousVersion = menu;
 
-      if (!currentVersion) {
-        currentVersion = menu;
+      if (!latestVersionMenu) {
+        latestVersionMenu = menu;
       }
     });
 
-    return currentVersion;
+    return latestVersionMenu;
   }
 
   /**
@@ -377,16 +376,16 @@
 
     // Cycle iterating the array of system menus to fulfill the necessary conditions.
     menus.forEach(function(item) {
-      var latestVersionMenu;
+      var currentVersion;
 
       if (packageTypeMenus[item.package].length && !hasActiveMenu) {
         // Find the currently active menu.
-        latestVersionMenu = packageTypeMenus[item.package].find(function(menu) {
+        currentVersion = packageTypeMenus[item.package].find(function(menu) {
           return menu.instances.length > 0;
         });
 
-        if (latestVersionMenu) {
-          currentMenu = latestVersionMenu;
+        if (currentVersion) {
+          currentMenu = currentVersion;
           hasActiveMenu = true;
         }
       }
@@ -396,18 +395,18 @@
           // Keeping the previous menu and deleting the instance if the user chose a different menu type.
           // Implemented to keep the previous version of the user menu.
           previousMenu.instances = [];
-          latestVersionMenu = previousMenu;
-          result.push(latestVersionMenu);
+          currentVersion = previousMenu;
+          result.push(currentVersion);
 
           return;
         }
 
-        if (!latestVersionMenu) {
+        if (!currentVersion) {
           // Sorting custom menus by version
-          latestVersionMenu = getLatestMenuVersion(packageTypeMenus[item.package]);
+          currentVersion = getLatestMenuVersion(packageTypeMenus[item.package]);
         }
 
-        result.push(latestVersionMenu);
+        result.push(currentVersion);
       }
     });
 
