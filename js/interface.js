@@ -7,7 +7,6 @@
   };
 
   var appId = Fliplet.Env.get('appId');
-  var organizationId = Fliplet.Env.get('organizationId');
 
   var topMenu = Fliplet.App.Settings.get('topMenu') || {
     id: 'pages'
@@ -313,7 +312,7 @@
         'v1/widgets?include_instances=true&tags=type:menu',
         '&include_all_versions=true',
         '&appId=' + Fliplet.Env.get('appId'),
-        '&organizationId=' + (organizationId || '')
+        '&organizationId=' + (Fliplet.Env.get('organizationId') || '')
       ].join('')
     }).then(function(response) {
       return Promise.resolve(response.widgets);
@@ -329,25 +328,36 @@
 
   function getLatestMenuVersion(data, latestVersionMenu) {
     var previousVersion;
+    var currentVersion = latestVersionMenu;
 
     data.forEach(function(menu) {
-      var formattedMenuVersion = menu.version.split('.').join('');
-      var formattedPreviousMenuVersion = previousVersion ? previousVersion.version.split('.').join('') : null;
+      var formattedMenuVersion = menu.version.split('.');
+      var formattedPreviousMenuVersion = previousVersion ? previousVersion.version.split('.') : null;
 
-      // Compare each record with the previous one by version to find the newest version.
-      if (previousVersion && formattedPreviousMenuVersion !== formattedMenuVersion) {
-        latestVersionMenu = (formattedPreviousMenuVersion > formattedMenuVersion) ? previousVersion : null;
+      if (previousVersion && formattedMenuVersion.join('') !== formattedPreviousMenuVersion.join('')) {
+        for (var index = 0; index < formattedMenuVersion.length; index++) {
+          if (+formattedMenuVersion[index] === +formattedPreviousMenuVersion[index]) break;
+
+          if (+formattedMenuVersion[index] > +formattedPreviousMenuVersion[index]) {
+            currentVersion = menu;
+          }
+
+          if (+formattedMenuVersion[index] < +formattedPreviousMenuVersion[index]) {
+            currentVersion = previousVersion;
+          }
+
+          if (currentVersion) return;
+        }
       }
 
       previousVersion = menu;
 
-      // Always write the system menu first, then if iteration finds the newest version, latestVersionMenu will be overwritten.
-      if (!latestVersionMenu) {
-        latestVersionMenu = menu;
+      if (!currentVersion) {
+        currentVersion = menu;
       }
     });
 
-    return latestVersionMenu;
+    return currentVersion;
   }
 
   /**
@@ -360,18 +370,18 @@
     var result = [];
     var hasActiveMenu = false;
 
+    // Grouping an array of one type of menu.
+    var packageTypeMenus = _.groupBy(menus, function(menu) {
+      return menu.package;
+    });
+
     // Cycle iterating the array of system menus to fulfill the necessary conditions.
     menus.forEach(function(item) {
       var latestVersionMenu;
 
-      // Creating an array of one type of menu.
-      var packageTypeMenus = menus.filter(function(menu) {
-        return menu.package === item.package;
-      });
-
-      if (packageTypeMenus.length && !hasActiveMenu) {
+      if (packageTypeMenus[item.package].length && !hasActiveMenu) {
         // Find the currently active menu.
-        latestVersionMenu = packageTypeMenus.find(function(menu) {
+        latestVersionMenu = packageTypeMenus[item.package].find(function(menu) {
           return menu.instances.length > 0;
         });
 
@@ -393,7 +403,7 @@
         }
 
         // Sorting custom menus by version
-        latestVersionMenu = getLatestMenuVersion(packageTypeMenus, latestVersionMenu);
+        latestVersionMenu = getLatestMenuVersion(packageTypeMenus[item.package], latestVersionMenu);
 
         result.push(latestVersionMenu);
       }
