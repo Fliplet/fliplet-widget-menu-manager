@@ -319,12 +319,12 @@
     });
   }
 
-  function isNewerVersion(latestVersionMenu, currentMenu) {
-    if (latestVersionMenu.join('') !== currentMenu.join('')) {
+  function isNewerVersion(latestVersionMenu, currentMenuVersion) {
+    if (latestVersionMenu.join('') !== currentMenuVersion.join('')) {
       for (var index = 0; index < latestVersionMenu.length; index++) {
-        if (+latestVersionMenu[index] > +currentMenu[index]) return true;
+        if (+latestVersionMenu[index] > +currentMenuVersion[index]) return true;
 
-        if (+latestVersionMenu[index] < +currentMenu[index]) return false;
+        if (+latestVersionMenu[index] < +currentMenuVersion[index]) return false;
       }
 
       return false;
