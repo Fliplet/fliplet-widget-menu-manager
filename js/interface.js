@@ -326,9 +326,9 @@
    * @returns {Object} latestVersionMenu - object which contains the latest version of current menu package type
    */
 
-  function getLatestMenuVersion(data, latestVersionMenu) {
+  function getLatestMenuVersion(data) {
     var previousVersion;
-    var currentVersion = latestVersionMenu;
+    var currentVersion;
 
     data.forEach(function(menu) {
       var formattedMenuVersion = menu.version.split('.');
@@ -346,7 +346,7 @@
             currentVersion = previousVersion;
           }
 
-          if (currentVersion) return;
+          if (currentMenu) return;
         }
       }
 
@@ -402,8 +402,10 @@
           return;
         }
 
-        // Sorting custom menus by version
-        latestVersionMenu = getLatestMenuVersion(packageTypeMenus[item.package], latestVersionMenu);
+        if (!latestVersionMenu) {
+          // Sorting custom menus by version
+          latestVersionMenu = getLatestMenuVersion(packageTypeMenus[item.package]);
+        }
 
         result.push(latestVersionMenu);
       }
