@@ -367,9 +367,7 @@
     var hasActiveMenu = false;
 
     // Grouping an array of one type of menu.
-    var packageTypeMenus = _.groupBy(menus, function(menu) {
-      return menu.package;
-    });
+    var packageTypeMenus = _.groupBy(menus, 'package');
 
     // Cycle iterating the array of system menus to fulfill the necessary conditions.
     menus.forEach(function(item) {
