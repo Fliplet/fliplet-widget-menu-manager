@@ -319,6 +319,18 @@
     });
   }
 
+  function isNewerVersion(latestVersionMenu, currentMenu) {
+    if (latestVersionMenu.join('') !== currentMenu.join('')) {
+      for (var index = 0; index < latestVersionMenu.length; index++) {
+        if (+latestVersionMenu[index] > +currentMenu[index]) return true;
+
+        if (+latestVersionMenu[index] < +currentMenu[index]) return false;
+      }
+
+      return false;
+    }
+  }
+
   /**
    * Function to filter organizationMenus by version.
    * @param {Array} data - array of organizationMenus
@@ -326,30 +338,15 @@
    */
 
   function getLatestMenuVersion(data) {
-    var previousVersion;
     var latestVersionMenu;
 
     data.forEach(function(menu) {
       var formattedMenuVersion = menu.version.split('.');
-      var formattedPreviousMenuVersion = previousVersion ? previousVersion.version.split('.') : null;
+      var formattedLatestVersionMenu = latestVersionMenu ? latestVersionMenu.version.split('.') : null;
 
-      if (previousVersion && formattedMenuVersion.join('') !== formattedPreviousMenuVersion.join('')) {
-        for (var index = 0; index < formattedMenuVersion.length; index++) {
-          if (+formattedMenuVersion[index] === +formattedPreviousMenuVersion[index]) break;
-
-          if (+formattedMenuVersion[index] > +formattedPreviousMenuVersion[index]) {
-            latestVersionMenu = menu;
-          }
-
-          if (+formattedMenuVersion[index] < +formattedPreviousMenuVersion[index]) {
-            latestVersionMenu = previousVersion;
-          }
-
-          if (currentMenu) return;
-        }
+      if (latestVersionMenu) {
+        latestVersionMenu = isNewerVersion(formattedLatestVersionMenu, formattedMenuVersion) ? latestVersionMenu : menu;
       }
-
-      previousVersion = menu;
 
       if (!latestVersionMenu) {
         latestVersionMenu = menu;
