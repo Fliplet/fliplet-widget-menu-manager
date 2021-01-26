@@ -639,8 +639,6 @@
     currentMenuItems.push(row);
 
     $('#menu-' + dataSourceId).append(templates.menuLink(row));
-
-    initLinkProvider(row, dataSourceId);
   }
 
   function loadCustomMenus() {
