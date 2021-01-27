@@ -248,10 +248,7 @@
       // First, remove any existing menu widgetInstance
       Promise.all(customMenus.map(function(menu) {
         return Promise.all(menu.instances.map(function(instance) {
-          return Fliplet.API.request({
-            method: 'DELETE',
-            url: 'v1/widget-instances/' + instance.id
-          });
+          return deleteInstances(instance);
         }));
       })).then(function() {
         // Then, create the new instance
@@ -363,55 +360,45 @@
    */
 
   function generateMenuList(menus) {
-    var result = [];
-    var hasActiveMenu = false;
+    var menusByPackage = _.groupBy(menus, 'package');
+    var menuList = [];
 
-    // Grouping an array of one type of menu.
-    var packageTypeMenus = _.groupBy(menus, 'package');
+    _.forIn(menusByPackage, function(menuVersions) {
+      var currentVersion = _.find(menuVersions, function(menuVersions) {
+        return menuVersions.instances.length;
+      });
 
-    // Cycle iterating the array of system menus to fulfill the necessary conditions.
-    menus.forEach(function(item) {
-      var currentVersion;
-
-      if (packageTypeMenus[item.package].length && !hasActiveMenu) {
-        // Find the currently active menu.
-        currentVersion = packageTypeMenus[item.package].find(function(menu) {
-          return menu.instances.length > 0;
-        });
-
-        if (currentVersion) {
-          currentMenu = currentVersion;
-          hasActiveMenu = true;
-        }
+      if (currentMenu) {
+        menuList.push(currentVersion);
       }
 
-      if (!result.length || !result.find(function(field) { return field.package === item.package; })) {
-        if (previousMenu && previousMenu.package === item.package) {
-          // Keeping the previous menu and deleting the instance if the user chose a different menu type.
-          // Implemented to keep the previous version of the user menu.
-          previousMenu.instances = [];
-          currentVersion = previousMenu;
-          result.push(currentVersion);
-
-          return;
-        }
-
-        if (!currentVersion) {
-          // Sorting custom menus by version
-          currentVersion = getLatestMenuVersion(packageTypeMenus[item.package]);
-        }
-
-        result.push(currentVersion);
-      }
+      menuList.push(getLatestMenuVersion(menuVersions));
     });
 
-    return result;
+    return _.sortBy(menuList, 'name');
   }
 
   function loadCustomMenuWidgets() {
-    $('.menu-styles-wrapper').addClass('loading');
-
     return fetchCustomMenuWidgets().then(function(menus) {
+      var menusWithInstances = _.filter(menus, function(menu) {
+        return menu.instances.length;
+      });
+
+      // If there is more than 1 menu with instances, clean up
+      if (menusWithInstances.legnth > 1) {
+        // Keep the first one found
+        menusWithInstances.shift();
+
+        var instancesToDelete = _.flatten(_.map(menusWithInstances, function(menu) {
+          return _.map(menu.instances, 'id');
+        }));
+
+        // Delete unneeded instances and fetch menus again
+        return deleteInstances(instancesToDelete).then(fetchCustomMenuWidgets);
+      }
+
+      return Promise.resolve(menus);
+    }).then(function(menus) {
       var sortedMenus = generateMenuList(menus);
 
       $customMenus.html('');
@@ -441,6 +428,13 @@
       if (previousMenu) {
         $('.radio_' + previousMenu.id).prop('checked', false);
       }
+    });
+  }
+
+  function deleteInstances(options) {
+    Fliplet.API.request({
+      method: 'DELETE',
+      url: 'v1/widget-instances/' + options.id
     });
   }
 
