@@ -370,6 +370,7 @@
 
       if (currentMenu) {
         menuList.push(currentVersion);
+        return;
       }
 
       menuList.push(getLatestMenuVersion(menuVersions));
