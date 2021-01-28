@@ -24,8 +24,6 @@
   var menuDataSources = [];
   var customMenus = [];
   var customMenuLoadingPromise;
-  var previousMenu;
-
   var isFilePickerClosed = false;
 
   function template(name) {
@@ -243,8 +241,6 @@
       $('.menu-styles-wrapper').addClass('loading');
       $('.radio_' + widgetId).prop('checked', true);
 
-      previousMenu = _.cloneDeep(currentMenu);
-
       // First, remove any existing menu widgetInstance
       Promise.all(customMenus.map(function(menu) {
         return Promise.all(menu.instances.map(function(instance) {
@@ -429,10 +425,6 @@
       });
 
       $('.menu-styles-wrapper').removeClass('loading');
-
-      if (previousMenu) {
-        $('.radio_' + previousMenu.id).prop('checked', false);
-      }
     });
   }
 
