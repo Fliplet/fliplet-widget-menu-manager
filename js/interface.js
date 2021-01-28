@@ -316,8 +316,10 @@
   function isNewerVersion(latestVersionMenu, currentMenuVersion) {
     var difference = latestVersionMenu.length - currentMenuVersion.length;
 
-    for (var addIndex = 0; addIndex < Math.abs(difference); addIndex++) {
-      Math.sign(difference) === 1 ? currentMenuVersion.push('0') : latestVersionMenu.push('0');
+    if (difference !== 0) {
+      for (var addIndex = 0; addIndex < Math.abs(difference); addIndex++) {
+        Math.sign(difference) === 1 ? currentMenuVersion.push('0') : latestVersionMenu.push('0');
+      }
     }
 
     for (var index = 0; index < latestVersionMenu.length; index++) {
