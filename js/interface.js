@@ -24,6 +24,7 @@
   var menuDataSources = [];
   var customMenus = [];
   var customMenuLoadingPromise;
+  
   var isFilePickerClosed = false;
 
   function template(name) {
