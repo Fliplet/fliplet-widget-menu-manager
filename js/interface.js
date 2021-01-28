@@ -272,7 +272,7 @@
           return;
         }
 
-        currentProvider = Fliplet.Widget.open(currentMenu.instances[0].id);
+        currentProvider = Fliplet.Widget.open(currentMenu.id);
         setWidgetControls('settings');
 
         currentProvider.then(function() {
@@ -318,14 +318,12 @@
 
   function isNewerVersion(latestVersionMenu, currentMenuVersion) {
     for (var index = 0; index < latestVersionMenu.length; index++) {
-      if (+latestVersionMenu[index] === +currentMenuVersion) break;
-
       if (+latestVersionMenu[index] > +currentMenuVersion[index]) return true;
 
       if (+latestVersionMenu[index] < +currentMenuVersion[index]) return false;
     }
 
-    return true;
+    return false;
   }
 
   /**
@@ -369,7 +367,7 @@
       });
 
       // A version is currently in use
-      if (currentMenu) {
+      if (currentVersion) {
         return menuList.push(currentVersion);
       }
 
@@ -412,8 +410,12 @@
           return;
         }
 
-        if (menu.instances.length && menu.hasInterface) {
-          $('[data-settings]').removeClass('hidden');
+        if (menu.instances.length) {
+          currentMenu = menu.instances[0];
+
+          if (menu.hasInterface) {
+            $('[data-settings]').removeClass('hidden');
+          }
         }
 
         $customMenus.append(templates.menuWidget({
