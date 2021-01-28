@@ -317,15 +317,15 @@
   }
 
   function isNewerVersion(latestVersionMenu, currentMenuVersion) {
-    if (latestVersionMenu.join('') !== currentMenuVersion.join('')) {
-      for (var index = 0; index < latestVersionMenu.length; index++) {
-        if (+latestVersionMenu[index] > +currentMenuVersion[index]) return true;
+    for (var index = 0; index < latestVersionMenu.length; index++) {
+      if (+latestVersionMenu[index] === +currentMenuVersion) break;
 
-        if (+latestVersionMenu[index] < +currentMenuVersion[index]) return false;
-      }
+      if (+latestVersionMenu[index] > +currentMenuVersion[index]) return true;
 
-      return false;
+      if (+latestVersionMenu[index] < +currentMenuVersion[index]) return false;
     }
+
+    return true;
   }
 
   /**
@@ -368,14 +368,16 @@
         return menuVersions.instances.length;
       });
 
+      // A version is currently in use
       if (currentMenu) {
-        menuList.push(currentVersion);
-        return;
+        return menuList.push(currentVersion);
       }
 
+      // Find latest version of menu
       menuList.push(getLatestMenuVersion(menuVersions));
     });
 
+    // Sort displayed menus by display name
     return _.sortBy(menuList, 'name');
   }
 
