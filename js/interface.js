@@ -391,6 +391,10 @@
         // Keep the first one found
         menusWithInstances.shift();
 
+        if (menusWithInstances[0].instances.length > 1) {
+          menusWithInstances.instances.shift();
+        }
+
         var instancesToDelete = _.flatten(_.map(menusWithInstances, function(menu) {
           return _.map(menu.instances, 'id');
         }));
