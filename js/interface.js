@@ -337,15 +337,13 @@
     var latestVersionMenu;
 
     data.forEach(function(menu) {
+      latestVersionMenu = menu;
+
       var formattedMenuVersion = menu.version.split('.');
       var formattedLatestVersionMenu = latestVersionMenu ? latestVersionMenu.version.split('.') : null;
 
       if (latestVersionMenu) {
         latestVersionMenu = isNewerVersion(formattedLatestVersionMenu, formattedMenuVersion) ? latestVersionMenu : menu;
-      }
-
-      if (!latestVersionMenu) {
-        latestVersionMenu = menu;
       }
     });
 
@@ -377,7 +375,9 @@
     });
 
     // Sort displayed menus by display name
-    return _.sortBy(menuList, 'name');
+    return _.sortBy(menuList, function(menu) {
+      return menu.name.trim().toUpperCase();
+    });
   }
 
   function loadCustomMenuWidgets() {
@@ -387,7 +387,7 @@
       });
 
       // If there is more than 1 menu with instances, clean up
-      if (menusWithInstances.legnth > 1) {
+      if (menusWithInstances.length > 1) {
         // Keep the first one found
         menusWithInstances.shift();
 
@@ -396,7 +396,7 @@
         }));
 
         // Delete unneeded instances and fetch menus again
-        return deleteInstances(instancesToDelete).then(fetchCustomMenuWidgets);
+        return deleteInstances({ id: instancesToDelete }).then(fetchCustomMenuWidgets);
       }
 
       return Promise.resolve(menus);
