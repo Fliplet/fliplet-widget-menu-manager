@@ -392,7 +392,7 @@
         menusWithInstances.shift();
 
         if (menusWithInstances[0].instances.length > 1) {
-          menusWithInstances.instances.shift();
+          menusWithInstances[0].instances.shift();
         }
 
         var instancesToDelete = _.flatten(_.map(menusWithInstances, function(menu) {
@@ -400,7 +400,7 @@
         }));
 
         // Delete unneeded instances and fetch menus again
-        return deleteInstances({ id: instancesToDelete }).then(fetchCustomMenuWidgets);
+        return deleteInstances({ id: instancesToDelete[0] }).then(fetchCustomMenuWidgets);
       }
 
       return Promise.resolve(menus);
@@ -438,7 +438,7 @@
   }
 
   function deleteInstances(options) {
-    Fliplet.API.request({
+    return Fliplet.API.request({
       method: 'DELETE',
       url: 'v1/widget-instances/' + options.id
     });
