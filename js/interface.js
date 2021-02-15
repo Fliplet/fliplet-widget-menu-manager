@@ -313,6 +313,10 @@
 
   function isNewerVersion(latestVersionMenu, currentMenuVersion) {
     for (var index = 0; index < latestVersionMenu.length; index++) {
+      if (isNaN(+latestVersionMenu[index])) latestVersionMenu[index] = 0;
+
+      if (isNaN(+currentMenuVersion[index])) currentMenuVersion[index] = 0;
+
       return +latestVersionMenu[index] > +currentMenuVersion[index];
     }
 
