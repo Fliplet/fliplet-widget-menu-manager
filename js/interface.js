@@ -391,16 +391,15 @@
         // Keep the first one found
         menusWithInstances.shift();
 
-        if (menusWithInstances[0].instances.length > 1) {
-          menusWithInstances[0].instances.shift();
-        }
-
         var instancesToDelete = _.flatten(_.map(menusWithInstances, function(menu) {
           return _.map(menu.instances, 'id');
         }));
 
         // Delete unneeded instances and fetch menus again
-        return deleteInstances({ id: instancesToDelete[0] }).then(fetchCustomMenuWidgets);
+        return Promise.all(instancesToDelete.map(function(item) {
+          return deleteInstances({ id: item });
+        }))
+          .then(fetchCustomMenuWidgets());
       }
 
       return Promise.resolve(menus);
