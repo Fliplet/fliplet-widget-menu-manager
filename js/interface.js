@@ -325,8 +325,8 @@
 
   /**
    * Function to filter organizationMenus by version.
-   * @param { Array } data - array of organizationMenus
-   * @returns { Object } latestVersionMenu - object which contains the latest version of current menu package type
+   * @param {Array} data - array of organizationMenus
+   * @returns {Object} latestVersionMenu - object which contains the latest version of current menu package type
    */
 
   function getLatestMenuVersion(data) {
@@ -351,8 +351,8 @@
 
   /**
    * Creates a list of menu widgets to be displayed based on versions and current usage
-   * @param { Array } menus - List of menu widgets
-   * @returns { Array } List of menu widgets to be displayed based on versions and current usage
+   * @param {Array} menus - List of menu widgets
+   * @returns {Array} List of menu widgets to be displayed based on versions and current usage
    */
 
   function generateMenuList(menus) {
@@ -395,9 +395,9 @@
         }));
 
         // Delete unneeded instances and fetch menus again
-        return Promise.all(instancesToDelete.map(function(item) {
-          return deleteInstance({ id: item });
-        })).then(fetchCustomMenuWidgets());
+        return Promise.all(instancesToDelete.map(function(id) {
+          return deleteInstance({ id: id });
+        })).then(fetchCustomMenuWidgets);
       }
 
       return Promise.resolve(menus);
