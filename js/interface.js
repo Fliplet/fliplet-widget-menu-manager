@@ -244,12 +244,7 @@
 
       // First, remove any existing menu widgetInstance
       Promise.all(customMenus.map(function(menu) {
-        return Promise.all(menu.instances.map(function(instance) {
-          return Fliplet.API.request({
-            method: 'DELETE',
-            url: 'v1/widget-instances/' + instance.id
-          });
-        }));
+        return Promise.all(menu.instances.map(deleteInstance));
       })).then(function() {
         // Then, create the new instance
         return Fliplet.API.request({
@@ -307,6 +302,7 @@
     return Fliplet.API.request({
       url: [
         'v1/widgets?include_instances=true&tags=type:menu',
+        '&include_all_versions=true',
         '&appId=' + Fliplet.Env.get('appId'),
         '&organizationId=' + (Fliplet.Env.get('organizationId') || '')
       ].join('')
@@ -315,14 +311,103 @@
     });
   }
 
+  function isNewerVersion(latestVersionMenu, currentMenuVersion) {
+    for (var index = 0; index < latestVersionMenu.length; index++) {
+      if (isNaN(+latestVersionMenu[index])) latestVersionMenu[index] = 0;
+
+      if (isNaN(+currentMenuVersion[index])) currentMenuVersion[index] = 0;
+
+      return +latestVersionMenu[index] > +currentMenuVersion[index];
+    }
+
+    return false;
+  }
+
+  /**
+   * Function to filter organizationMenus by version.
+   * @param {Array} data - array of organizationMenus
+   * @returns {Object} latestVersionMenu - object which contains the latest version of current menu package type
+   */
+
+  function getLatestMenuVersion(data) {
+    var latestVersionMenu;
+    var previousMenu;
+
+    data.forEach(function(menu) {
+      var formattedMenuVersion = menu.version.split('.');
+      var formattedLatestVersionMenu = previousMenu ? previousMenu.version.split('.') : null;
+
+      if (previousMenu) {
+        latestVersionMenu = isNewerVersion(formattedLatestVersionMenu, formattedMenuVersion) ? previousMenu : menu;
+      } else {
+        latestVersionMenu = menu;
+      }
+
+      previousMenu = menu;
+    });
+
+    return latestVersionMenu;
+  }
+
+  /**
+   * Creates a list of menu widgets to be displayed based on versions and current usage
+   * @param {Array} menus - List of menu widgets
+   * @returns {Array} List of menu widgets to be displayed based on versions and current usage
+   */
+
+  function generateMenuList(menus) {
+    var menusByPackage = _.groupBy(menus, 'package');
+    var menuList = [];
+
+    _.forIn(menusByPackage, function(menuVersions) {
+      var currentVersion = _.find(menuVersions, function(menuVersions) {
+        return menuVersions.instances.length;
+      });
+
+      // A version is currently in use
+      if (currentVersion) {
+        return menuList.push(currentVersion);
+      }
+
+      // Find latest version of menu
+      menuList.push(getLatestMenuVersion(menuVersions));
+    });
+
+    // Sort displayed menus by display name
+    return _.sortBy(menuList, function(menu) {
+      return menu.name.trim().toUpperCase();
+    });
+  }
+
   function loadCustomMenuWidgets() {
-    $('.menu-styles-wrapper').addClass('loading');
-
     return fetchCustomMenuWidgets().then(function(menus) {
-      customMenus = menus;
-      $customMenus.html('');
+      var menusWithInstances = _.filter(menus, function(menu) {
+        return menu.instances.length;
+      });
 
-      menus.forEach(function(menu) {
+      // If there is more than 1 menu with instances, clean up
+      if (menusWithInstances.length > 1) {
+        // Keep the first one found
+        menusWithInstances.shift();
+
+        var instancesToDelete = _.flatten(_.map(menusWithInstances, function(menu) {
+          return _.map(menu.instances, 'id');
+        }));
+
+        // Delete unneeded instances and fetch menus again
+        return Promise.all(instancesToDelete.map(function(id) {
+          return deleteInstance({ id: id });
+        })).then(fetchCustomMenuWidgets);
+      }
+
+      return Promise.resolve(menus);
+    }).then(function(menus) {
+      var sortedMenus = generateMenuList(menus);
+
+      $customMenus.html('');
+      customMenus = sortedMenus;
+
+      sortedMenus.forEach(function(menu) {
         if (_.isEmpty(menu.settings)) {
           return;
         }
@@ -346,6 +431,13 @@
       });
 
       $('.menu-styles-wrapper').removeClass('loading');
+    });
+  }
+
+  function deleteInstance(instance) {
+    return Fliplet.API.request({
+      method: 'DELETE',
+      url: 'v1/widget-instances/' + instance.id
     });
   }
 
