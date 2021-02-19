@@ -317,7 +317,9 @@
 
       if (isNaN(+currentMenuVersion[index])) currentMenuVersion[index] = 0;
 
-      return +latestVersionMenu[index] > +currentMenuVersion[index];
+      if (+latestVersionMenu[index] > +currentMenuVersion[index]) return true;
+
+      if (+latestVersionMenu[index] < +currentMenuVersion[index]) return false;
     }
 
     return false;
@@ -331,19 +333,16 @@
 
   function getLatestMenuVersion(data) {
     var latestVersionMenu;
-    var previousMenu;
 
     data.forEach(function(menu) {
       var formattedMenuVersion = menu.version.split('.');
-      var formattedLatestVersionMenu = previousMenu ? previousMenu.version.split('.') : null;
+      var formattedLatestVersionMenu = latestVersionMenu ? latestVersionMenu.version.split('.') : null;
 
-      if (previousMenu) {
-        latestVersionMenu = isNewerVersion(formattedLatestVersionMenu, formattedMenuVersion) ? previousMenu : menu;
+      if (latestVersionMenu) {
+        latestVersionMenu = isNewerVersion(formattedLatestVersionMenu, formattedMenuVersion) ? latestVersionMenu : menu;
       } else {
         latestVersionMenu = menu;
       }
-
-      previousMenu = menu;
     });
 
     return latestVersionMenu;
