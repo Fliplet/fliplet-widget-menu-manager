@@ -184,6 +184,7 @@
           return;
         }
 
+        currentMenuItems = [];
         getMenu = addMenu(dataSource);
       }
 
