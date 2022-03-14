@@ -559,7 +559,8 @@
 
         ensureLinkProviderIsInitialized(sortedItemId);
 
-        ui.item.addClass('focus').css('height', $(ui.item).outerHeight() + 2);
+        $('.panel-collapse.in').collapse('hide');
+        ui.item.addClass('focus').css('height', ui.helper.find('.panel-heading').outerHeight() + 2);
         $('.panel').not(ui.item).addClass('faded');
       },
       stop: function(event, ui) {
