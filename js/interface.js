@@ -147,7 +147,7 @@
       .on('show.bs.collapse', '.panel-collapse', function() {
         var menuItemId = $(this).parent().data('id');
 
-        ensureLinkProviderIsInitialized(menuItemId);
+        initializeLinkProvider(menuItemId);
 
         $(this).siblings('.panel-heading').find('.fa-chevron-right').removeClass('fa-chevron-right').addClass('fa-chevron-down');
       })
@@ -228,7 +228,9 @@
         }
       }
 
-      if (!currentProvider) { return; }
+      if (!currentProvider) {
+        return;
+      }
 
       currentProvider.forwardCancelRequest();
     });
@@ -557,7 +559,7 @@
       start: function(event, ui) {
         var sortedItemId = $(ui.item).data('id');
 
-        ensureLinkProviderIsInitialized(sortedItemId);
+        initializeLinkProvider(sortedItemId);
 
         $('.panel-collapse.in').collapse('hide');
         ui.item.addClass('focus').css('height', ui.helper.find('.panel-heading').outerHeight() + 2);
@@ -626,33 +628,41 @@
 
   /**
    * This function ensures the initLinkProvider method has been initialized
-   * @param {int} menuItemId - an id of the menu item we should check
-   * @returns {void}
+   * @param {Number} menuItemId - an id of the menu item we should check
+   * @returns {undefined}
   */
-  function ensureLinkProviderIsInitialized(menuItemId) {
+  function initializeLinkProvider(menuItemId) {
+    if (!menuItemId) {
+      return;
+    }
+
     var isProviderInitialized = menusPromises[currentDataSource.id].some(function(provider) {
       return provider.row.id === menuItemId;
     });
 
     // We should only initialize a new provider to avoid errors with forward requests
-    if (!isProviderInitialized) {
-      currentMenuItems.some(function(menuItem) {
-        if (menuItem.id === menuItemId) {
-          // sets up new provider
-          $('[data-id="' + menuItemId + '"] .link').html('');
-          initLinkProvider(menuItem, currentDataSource.id);
-
-          return true;
-        }
-      });
+    if (isProviderInitialized) {
+      return;
     }
+
+    currentMenuItems.some(function(menuItem) {
+      if (menuItem.id !== menuItemId) {
+        return;
+      }
+
+      // Sets up new provider
+      $('[data-id="' + menuItemId + '"] .link').html('');
+      initLinkProvider(menuItem, currentDataSource.id);
+
+      return true;
+    });
   }
 
   /**
-   *  Method to merge links where link provider wasn't called
-   * @param {array} menuDataEntries - array of the entries which we will put into the data source
-   * @param {array} sortedIds - array of the sorted menu id's
-   * @returns {void}
+   * Method to merge links where link provider wasn't called
+   * @param {Array} menuDataEntries - array of the entries which we will put into the data source
+   * @param {Array} sortedIds - array of the sorted menu id's
+   * @returns {undefined}
   */
   function mergeMenuEntries(menuDataEntries, sortedIds) {
     currentMenuItems.forEach(function(menuItem) {
@@ -703,8 +713,6 @@
 
     linkActionProvider.then(function(data) {
       row.data.action = data && data.data.action !== 'none' ? data.data : null;
-
-      return Promise.resolve();
     });
 
     linkActionProvider.row = row;
