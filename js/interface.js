@@ -55,10 +55,10 @@
   }
 
   /**
-   * We are using this function because there is a posibiblity that
+   * We are using this function because there is a possibility that
    * our listener onEvent in the initLinkProvider function will fires after
    * this `cancel-button-pressed` event and so to avoid issue when we
-   * redirect user to the menu styles tab we are using this fucntion.
+   * redirect user to the menu styles tab we are using this function.
    *
    * @returns {Promise} - return a value of the isFilePickerClosed.
    */
@@ -625,17 +625,17 @@
   }
 
   /**
-   * This function ensures the initLinkProvider method has been initialised
+   * This function ensures the initLinkProvider method has been initialized
    * @param {int} menuItemId - an id of the menu item we should check
    * @returns {void}
   */
   function ensureLinkProviderIsInitialized(menuItemId) {
-    var isProviderInited = menusPromises[currentDataSource.id].some(function(provider) {
+    var isProviderInitialized = menusPromises[currentDataSource.id].some(function(provider) {
       return provider.row.id === menuItemId;
     });
 
-    // We sould init only a new provider to avoid erros with forward requests
-    if (!isProviderInited) {
+    // We should only initialize a new provider to avoid errors with forward requests
+    if (!isProviderInitialized) {
       currentMenuItems.some(function(menuItem) {
         if (menuItem.id === menuItemId) {
           // sets up new provider
@@ -661,9 +661,9 @@
       });
       var menuItemOrder = sortedIds.indexOf(menuItem.id.toString());
 
-      // if menuItemOreder === -1 it means that no such DOM elem and we shouldn't add it
+      // if menuItemOrder === -1 it means that no such DOM elem and we shouldn't add it
       if (!isMenuItemExists && menuItemOrder !== -1) {
-        // Update link order in case it was chaged by the user
+        // Update link order in case it was changed by the user
         menuItem.data.order = menuItemOrder;
 
         // Update link label in case it was changed by the user
@@ -687,7 +687,7 @@
       // Events fired from the provider
       onEvent: function(event, data) {
         switch (event) {
-          case 'inteface-validate':
+          case 'interface-validate':
             Fliplet.Widget.toggleSaveButton(!!data.isValid);
             break;
           case 'file-picker-closed':
