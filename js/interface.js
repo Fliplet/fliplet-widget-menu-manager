@@ -55,10 +55,10 @@
   }
 
   /**
-   * We are using this function because there is a posibiblity that
+   * We are using this function because there is a possibility that
    * our listener onEvent in the initLinkProvider function will fires after
    * this `cancel-button-pressed` event and so to avoid issue when we
-   * redirect user to the menu styles tab we are using this fucntion.
+   * redirect user to the menu styles tab we are using this function.
    *
    * @returns {Promise} - return a value of the isFilePickerClosed.
    */
@@ -147,7 +147,7 @@
       .on('show.bs.collapse', '.panel-collapse', function() {
         var menuItemId = $(this).parent().data('id');
 
-        ensureLinkProviderIsInitialized(menuItemId);
+        initializeLinkProvider(menuItemId);
 
         $(this).siblings('.panel-heading').find('.fa-chevron-right').removeClass('fa-chevron-right').addClass('fa-chevron-down');
       })
@@ -228,7 +228,9 @@
         }
       }
 
-      if (!currentProvider) { return; }
+      if (!currentProvider) {
+        return;
+      }
 
       currentProvider.forwardCancelRequest();
     });
@@ -557,7 +559,7 @@
       start: function(event, ui) {
         var sortedItemId = $(ui.item).data('id');
 
-        ensureLinkProviderIsInitialized(sortedItemId);
+        initializeLinkProvider(sortedItemId);
 
         $('.panel-collapse.in').collapse('hide');
         ui.item.addClass('focus').css('height', ui.helper.find('.panel-heading').outerHeight() + 2);
@@ -625,34 +627,42 @@
   }
 
   /**
-   * This function ensures the initLinkProvider method has been initialised
-   * @param {int} menuItemId - an id of the menu item we should check
-   * @returns {void}
+   * This function ensures the initLinkProvider method has been initialized
+   * @param {Number} menuItemId - an id of the menu item we should check
+   * @returns {undefined}
   */
-  function ensureLinkProviderIsInitialized(menuItemId) {
-    var isProviderInited = menusPromises[currentDataSource.id].some(function(provider) {
+  function initializeLinkProvider(menuItemId) {
+    if (!menuItemId) {
+      return;
+    }
+
+    var isProviderInitialized = menusPromises[currentDataSource.id].some(function(provider) {
       return provider.row.id === menuItemId;
     });
 
-    // We sould init only a new provider to avoid erros with forward requests
-    if (!isProviderInited) {
-      currentMenuItems.some(function(menuItem) {
-        if (menuItem.id === menuItemId) {
-          // sets up new provider
-          $('[data-id="' + menuItemId + '"] .link').html('');
-          initLinkProvider(menuItem, currentDataSource.id);
-
-          return true;
-        }
-      });
+    // We should only initialize a new provider to avoid errors with forward requests
+    if (isProviderInitialized) {
+      return;
     }
+
+    currentMenuItems.some(function(menuItem) {
+      if (menuItem.id !== menuItemId) {
+        return;
+      }
+
+      // Sets up new provider
+      $('[data-id="' + menuItemId + '"] .link').html('');
+      initLinkProvider(menuItem, currentDataSource.id);
+
+      return true;
+    });
   }
 
   /**
-   *  Method to merge links where link provider wasn't called
-   * @param {array} menuDataEntries - array of the entries which we will put into the data source
-   * @param {array} sortedIds - array of the sorted menu id's
-   * @returns {void}
+   * Method to merge links where link provider wasn't called
+   * @param {Array} menuDataEntries - array of the entries which we will put into the data source
+   * @param {Array} sortedIds - array of the sorted menu id's
+   * @returns {undefined}
   */
   function mergeMenuEntries(menuDataEntries, sortedIds) {
     currentMenuItems.forEach(function(menuItem) {
@@ -661,9 +671,9 @@
       });
       var menuItemOrder = sortedIds.indexOf(menuItem.id.toString());
 
-      // if menuItemOreder === -1 it means that no such DOM elem and we shouldn't add it
+      // if menuItemOrder === -1 it means that no such DOM elem and we shouldn't add it
       if (!isMenuItemExists && menuItemOrder !== -1) {
-        // Update link order in case it was chaged by the user
+        // Update link order in case it was changed by the user
         menuItem.data.order = menuItemOrder;
 
         // Update link label in case it was changed by the user
@@ -687,7 +697,7 @@
       // Events fired from the provider
       onEvent: function(event, data) {
         switch (event) {
-          case 'inteface-validate':
+          case 'interface-validate':
             Fliplet.Widget.toggleSaveButton(!!data.isValid);
             break;
           case 'file-picker-closed':
@@ -703,8 +713,6 @@
 
     linkActionProvider.then(function(data) {
       row.data.action = data && data.data.action !== 'none' ? data.data : null;
-
-      return Promise.resolve();
     });
 
     linkActionProvider.row = row;
