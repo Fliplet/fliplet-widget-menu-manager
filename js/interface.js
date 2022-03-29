@@ -575,7 +575,6 @@
         $('.panel').not(ui.item).addClass('faded');
       },
       stop: function(event, ui) {
-
         if (currentLinkProvider) {
           currentLinkProvider.close();
 
@@ -661,8 +660,8 @@
     var isProviderInitialized = menusPromises[currentDataSource.id].some(function(provider) {
       return provider.row.id === menuItemId;
     });
-    
     // We should only initialize a new provider to avoid errors with forward requests
+
     if (isProviderInitialized) {
       return;
     }
