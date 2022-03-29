@@ -26,6 +26,7 @@
   var customMenuLoadingPromise;
 
   var isFilePickerClosed = false;
+  var currentLinkProvider = undefined;
 
   function template(name) {
     return Handlebars.compile($('#template-' + name).html());
@@ -559,12 +560,12 @@
       start: function(event, ui) {
         var sortedItemId = $(ui.item).data('id');
 
-        var currentProvider = _.find(menusPromises[currentDataSource.id], function(provider) {
+        currentLinkProvider = _.find(menusPromises[currentDataSource.id], function(provider) {
           return provider.row.id === sortedItemId;
         });
 
-        if (currentProvider) {
-          currentProvider.forwardSaveRequest();
+        if (currentLinkProvider) {
+          currentLinkProvider.forwardSaveRequest();
         }
 
         initializeLinkProvider(sortedItemId);
@@ -574,20 +575,16 @@
         $('.panel').not(ui.item).addClass('faded');
       },
       stop: function(event, ui) {
-        var sortedItemId = $(ui.item).data('id');
 
-        var currentProvider = _.find(menusPromises[currentDataSource.id], function(provider) {
-          return provider.row.id === sortedItemId;
-        });
-
-        if (currentProvider) {
-          currentProvider.close();
+        if (currentLinkProvider) {
+          currentLinkProvider.close();
 
           menusPromises[currentDataSource.id] = _.filter(menusPromises[currentDataSource.id], function(provider) {
-            return provider.row.id !== sortedItemId;
+            return provider.row.id !== currentLinkProvider.row.id;
           });
 
-          initializeLinkProvider(sortedItemId);
+          initializeLinkProvider(currentLinkProvider.row.id);
+          currentLinkProvider = undefined;
         }
 
 
