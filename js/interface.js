@@ -26,6 +26,7 @@
   var customMenuLoadingPromise;
 
   var isFilePickerClosed = false;
+  var currentLinkProvider = undefined;
 
   function template(name) {
     return Handlebars.compile($('#template-' + name).html());
@@ -559,6 +560,14 @@
       start: function(event, ui) {
         var sortedItemId = $(ui.item).data('id');
 
+        currentLinkProvider = _.find(menusPromises[currentDataSource.id], function(provider) {
+          return provider.row.id === sortedItemId;
+        });
+
+        if (currentLinkProvider) {
+          currentLinkProvider.forwardSaveRequest();
+        }
+
         initializeLinkProvider(sortedItemId);
 
         $('.panel-collapse.in').collapse('hide');
@@ -566,6 +575,18 @@
         $('.panel').not(ui.item).addClass('faded');
       },
       stop: function(event, ui) {
+        if (currentLinkProvider) {
+          currentLinkProvider.close();
+
+          menusPromises[currentDataSource.id] = _.filter(menusPromises[currentDataSource.id], function(provider) {
+            return provider.row.id !== currentLinkProvider.row.id;
+          });
+
+          initializeLinkProvider(currentLinkProvider.row.id);
+          currentLinkProvider = undefined;
+        }
+
+
         ui.item.removeClass('focus');
 
         $('.panel').not(ui.item).removeClass('faded');
@@ -639,8 +660,8 @@
     var isProviderInitialized = menusPromises[currentDataSource.id].some(function(provider) {
       return provider.row.id === menuItemId;
     });
-
     // We should only initialize a new provider to avoid errors with forward requests
+
     if (isProviderInitialized) {
       return;
     }
