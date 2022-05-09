@@ -1,3 +1,5 @@
+var saveButtonLabel;
+
 (function() {
   var templates = {
     menuOption: template('menuOption'),
@@ -804,11 +806,19 @@
   attachObservers();
   // Load menu widgets on startup
   loadCustomMenuWidgets();
+
+  // to open menu links
+  if (Fliplet.Widget.getData().links) {
+    $('#menu-manager-control a').click();
+    saveButtonLabel = 'Save';
+  } else {
+    saveButtonLabel = '';
+  }
 })();
 
 Fliplet().then(function() {
   // Initial labels
-  Fliplet.Widget.setSaveButtonLabel('');
+  Fliplet.Widget.setSaveButtonLabel(saveButtonLabel);
   Fliplet.Widget.setCancelButtonLabel('Close');
   Fliplet.Widget.toggleCancelButton(true);
 });
