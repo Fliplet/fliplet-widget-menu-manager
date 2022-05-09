@@ -1,4 +1,5 @@
-let saveButtonLabel = '';
+var saveButtonLabel;
+
 (function() {
   var templates = {
     menuOption: template('menuOption'),
@@ -807,9 +808,11 @@ let saveButtonLabel = '';
   loadCustomMenuWidgets();
 
   // to open menu links
-  if (JSON.parse(Fliplet.Navigate.query.data).links === 'true') {
+  if (Fliplet.Widget.getData().links) {
     $('#menu-manager-control a').click();
     saveButtonLabel = 'Save';
+  } else {
+    saveButtonLabel = '';
   }
 })();
 
