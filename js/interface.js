@@ -807,7 +807,7 @@
 
   Fliplet.Studio.onMessage((eventData) => {
     if (eventData && eventData.data && eventData.data.type === 'menu-tab-changed') {
-      $('.nav.nav-tabs li a[aria-controls="menu-manager"]').trigger('click');
+      $('.nav.nav-tabs li a[href="#menu-manager"]').trigger('click');
     }
   });
 })();
