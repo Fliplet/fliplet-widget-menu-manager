@@ -804,12 +804,6 @@
   attachObservers();
   // Load menu widgets on startup
   loadCustomMenuWidgets();
-
-  Fliplet.Studio.onMessage((eventData) => {
-    if (eventData && eventData.data && eventData.data.type === 'menu-tab-changed') {
-      $('.nav-tabs a[href="#menu-manager"]').trigger('click');
-    }
-  });
 })();
 
 Fliplet().then(function() {
