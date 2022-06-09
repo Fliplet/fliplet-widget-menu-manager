@@ -88,7 +88,7 @@
       }
     });
 
-    window.addEventListener('message', function(event) {
+    Fliplet.Studio.onMessage(event => {
       if (event.data === 'cancel-button-pressed') {
         if (currentProvider) {
           currentProvider.close();
@@ -120,6 +120,9 @@
         }
 
         Fliplet.Widget.toggleSaveButton(true);
+      } else if (event.tab) {
+        // A tab is requested
+        $(`.nav.nav-tabs a[href='#${event.tab}']`).trigger('click');
       }
     });
 
