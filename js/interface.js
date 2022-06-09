@@ -817,12 +817,6 @@
   loadCustomMenuWidgets();
 
   loadMenuManagerTab();
-
-  Fliplet.Studio.onMessage((eventData) => {
-    if (eventData && eventData.data && eventData.data.tab) {
-      $(`.nav.nav-tabs a[href='#${eventData.data.tab}']`).trigger('click');
-    }
-  });
 })();
 
 Fliplet().then(function() {
