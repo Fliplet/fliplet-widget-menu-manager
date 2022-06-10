@@ -120,9 +120,9 @@
         }
 
         Fliplet.Widget.toggleSaveButton(true);
-      } else if (event.tab) {
+      } else if (event.data && event.data.tab) {
         // A tab is requested
-        $(`.nav.nav-tabs a[href='#${event.tab}']`).trigger('click');
+        $(`.nav.nav-tabs a[href='#${event.data.tab}']`).trigger('click');
       }
     });
 
