@@ -88,7 +88,7 @@
       }
     });
 
-    window.addEventListener('message', function(event) {
+    Fliplet.Studio.onMessage(event => {
       if (event.data === 'cancel-button-pressed') {
         if (currentProvider) {
           currentProvider.close();
@@ -120,6 +120,9 @@
         }
 
         Fliplet.Widget.toggleSaveButton(true);
+      } else if (event.data && event.data.tab) {
+        // A tab is requested
+        $(`.nav.nav-tabs a[href='#${event.data.tab}']`).trigger('click');
       }
     });
 
@@ -801,14 +804,29 @@
     return customMenuLoadingPromise;
   }
 
+  function loadMenuManagerTab() {
+    var data = Fliplet.Widget.getData();
+
+    if (data && data.tab) {
+      $(`.nav.nav-tabs a[href='#${data.tab}']`).trigger('click');
+    }
+  }
+
   attachObservers();
   // Load menu widgets on startup
   loadCustomMenuWidgets();
+
+  loadMenuManagerTab();
 })();
 
 Fliplet().then(function() {
   // Initial labels
-  Fliplet.Widget.setSaveButtonLabel('');
-  Fliplet.Widget.setCancelButtonLabel('Close');
+  var data = Fliplet.Widget.getData();
+
+  if (!data || data.tab !== 'menu-manager') {
+    Fliplet.Widget.setSaveButtonLabel('');
+    Fliplet.Widget.setCancelButtonLabel('Close');
+  }
+
   Fliplet.Widget.toggleCancelButton(true);
 });
