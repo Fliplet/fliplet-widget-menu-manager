@@ -11,7 +11,7 @@ body {
 }
 
 .fa-times-thin:before {
-  content: '\00d7';
+  content: "\00d7";
 }
 
 .fl-widget-provider {
@@ -169,7 +169,7 @@ footer {
   top: 0;
   right: 0;
   opacity: 0;
-  color: #E60000;
+  color: #e60000;
   width: 38px;
   height: 38px;
   line-height: 38px;
@@ -214,7 +214,7 @@ footer {
 }
 
 .title-header {
-  border-bottom: 1px solid #E3E9EB;
+  border-bottom: 1px solid #e3e9eb;
   margin-bottom: 2rem;
   margin-top: 3rem;
   padding-bottom: 1.5em;
@@ -250,14 +250,10 @@ footer {
   justify-content: flex-start;
   flex-flow: wrap;
   opacity: 1;
-  -webkit-transition: opacity 1s ease;
-  transition: opacity 1s ease;
 }
 
 .menu-styles-wrapper.loading .custom-menus {
   opacity: 0.2;
-  -webkit-transition: opacity 1s ease;
-  transition: opacity 1s ease;
 }
 
 .menu-styles-container {
@@ -296,7 +292,7 @@ footer {
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
-  background-image: url('img/icon.png');
+  background-image: url("img/icon.png");
   overflow: hidden;
   margin-bottom: 10px;
 }
