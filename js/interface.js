@@ -138,9 +138,11 @@
         $item.remove();
 
         for (var i = 0; i < menusPromises[currentDataSource.id].length; i++) {
-          if (menusPromises[currentDataSource.id][i].row.id === id) {
+          var menusPromisesRow = menusPromises[currentDataSource.id][i].row;
+
+          if (menusPromisesRow.id === id) {
+            currentMenuItems.splice(menusPromisesRow.data.order, 1);
             menusPromises[currentDataSource.id].splice(i, 1);
-            currentMenuItems.splice(i, 1);
             break;
           }
         }
