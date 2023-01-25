@@ -138,10 +138,10 @@
         $item.remove();
 
         for (var i = 0; i < menusPromises[currentDataSource.id].length; i++) {
-          var menusPromisesRow = menusPromises[currentDataSource.id][i].row;
+          var menusPromisesRow = _.findIndex(currentMenuItems, function(item) { return item.id === id; });
 
-          if (menusPromisesRow.id === id) {
-            currentMenuItems.splice(menusPromisesRow.data.order, 1);
+          if (menusPromises[currentDataSource.id][i].row.id === id) {
+            currentMenuItems.splice(menusPromisesRow, 1);
             menusPromises[currentDataSource.id].splice(i, 1);
             break;
           }
