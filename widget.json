@@ -13,6 +13,7 @@
     "dependencies": [
       "fliplet-datasources",
       "fliplet-core",
+      "fliplet-utils",
       "fliplet-studio-ui",
       "jquery",
       "jquery-ui",
