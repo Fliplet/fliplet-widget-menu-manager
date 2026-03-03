@@ -13,12 +13,12 @@
     "dependencies": [
       "fliplet-datasources",
       "fliplet-core",
+      "fliplet-utils",
       "fliplet-studio-ui",
       "jquery",
       "jquery-ui",
       "handlebars",
-      "bootstrap",
-      "lodash"
+      "bootstrap"
     ],
     "assets": [
       "js/interface.js",

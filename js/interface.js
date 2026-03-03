@@ -139,7 +139,7 @@
 
         for (var i = 0; i < menusPromises[currentDataSource.id].length; i++) {
           if (menusPromises[currentDataSource.id][i].row.id === id) {
-            var currentMenuItem = _.findIndex(currentMenuItems, function(item) { return item.id === id; });
+            var currentMenuItem = Fliplet.Utils.findIndex(currentMenuItems, function(item) { return item.id === id; });
 
             currentMenuItems.splice(currentMenuItem, 1);
             menusPromises[currentDataSource.id].splice(i, 1);
@@ -182,7 +182,7 @@
       $('#menu-links').show();
 
       if (!$('#menu-' + menuId).length) {
-        var dataSource = _.find(menuDataSources, { id: parseInt(menuId, 10) });
+        var dataSource = Fliplet.Utils.find(menuDataSources, { id: parseInt(menuId, 10) });
 
         if (!dataSource) {
           console.warn('Menu data source not found');
@@ -287,7 +287,7 @@
       })
       .on('click', '[data-select-icon]', function() {
         var itemId = $(this).parents('.panel').data('id');
-        var currentItem = _.find(currentMenuItems, function(item) {
+        var currentItem = Fliplet.Utils.find(currentMenuItems, function(item) {
           return item.id === itemId;
         });
 
@@ -296,7 +296,7 @@
       .on('click', '.remove-icon', function() {
         var itemId = $(this).parents('.panel').data('id');
         var $parent = $(this).parents('.icon-selection-holder');
-        var currentItem = _.find(currentMenuItems, function(item) {
+        var currentItem = Fliplet.Utils.find(currentMenuItems, function(item) {
           return item.id === itemId;
         });
         var iconBak = currentItem.data.icon;
@@ -364,11 +364,25 @@
    */
 
   function generateMenuList(menus) {
-    var menusByPackage = _.groupBy(menus, 'package');
+    if (!Array.isArray(menus)) {
+      menus = [];
+    }
+
+    var menusByPackage = menus.reduce(function(acc, menu) {
+      var key = menu.package;
+
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+
+      acc[key].push(menu);
+
+      return acc;
+    }, {});
     var menuList = [];
 
-    _.forIn(menusByPackage, function(menuVersions) {
-      var currentVersion = _.find(menuVersions, function(menuVersions) {
+    Fliplet.Utils.forIn(menusByPackage, function(menuVersions) {
+      var currentVersion = Fliplet.Utils.find(menuVersions, function(menuVersions) {
         return menuVersions.instances.length;
       });
 
@@ -382,14 +396,14 @@
     });
 
     // Sort displayed menus by display name
-    return _.sortBy(menuList, function(menu) {
+    return Fliplet.Utils.sortBy(menuList, function(menu) {
       return menu.name.trim().toUpperCase();
     });
   }
 
   function loadCustomMenuWidgets() {
     return fetchCustomMenuWidgets().then(function(menus) {
-      var menusWithInstances = _.filter(menus, function(menu) {
+      var menusWithInstances = Fliplet.Utils.filter(menus, function(menu) {
         return menu.instances.length;
       });
 
@@ -398,9 +412,11 @@
         // Keep the first one found
         menusWithInstances.shift();
 
-        var instancesToDelete = _.flatten(_.map(menusWithInstances, function(menu) {
-          return _.map(menu.instances, 'id');
-        }));
+        var instancesToDelete = Fliplet.Utils.map(menusWithInstances, function(menu) {
+          return Fliplet.Utils.map(menu.instances, 'id');
+        });
+
+        instancesToDelete = Array.isArray(instancesToDelete) ? instancesToDelete.flat() : [];
 
         // Delete unneeded instances and fetch menus again
         return Promise.all(instancesToDelete.map(function(id) {
@@ -416,7 +432,7 @@
       customMenus = sortedMenus;
 
       sortedMenus.forEach(function(menu) {
-        if (_.isEmpty(menu.settings)) {
+        if (Fliplet.Utils.isEmpty(menu.settings)) {
           return;
         }
 
@@ -565,7 +581,7 @@
       start: function(event, ui) {
         var sortedItemId = $(ui.item).data('id');
 
-        currentLinkProvider = _.find(menusPromises[currentDataSource.id], function(provider) {
+        currentLinkProvider = Fliplet.Utils.find(menusPromises[currentDataSource.id], function(provider) {
           return provider.row.id === sortedItemId;
         });
 
@@ -583,7 +599,7 @@
         if (currentLinkProvider) {
           currentLinkProvider.close();
 
-          menusPromises[currentDataSource.id] = _.filter(menusPromises[currentDataSource.id], function(provider) {
+          menusPromises[currentDataSource.id] = Fliplet.Utils.filter(menusPromises[currentDataSource.id], function(provider) {
             return provider.row.id !== currentLinkProvider.row.id;
           });
 
@@ -644,7 +660,7 @@
             });
         }
 
-        rows = _.sortBy(rows, 'data.order');
+        rows = Fliplet.Utils.sortBy(rows, 'data.order');
         $('#menu-loading').hide();
         rows.forEach(function(row) {
           addLink(dataSource.id, row);
