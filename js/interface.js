@@ -661,6 +661,22 @@
         }
 
         rows = Fliplet.Utils.sortBy(rows, 'data.order');
+
+        // Deduplicate rows by page ID to fix corrupted menu data
+        var seenPages = {};
+
+        rows = rows.filter(function(row) {
+          var pageId = row.data && row.data.action && row.data.action.page;
+
+          if (!pageId) return true;
+
+          if (seenPages[pageId]) return false;
+
+          seenPages[pageId] = true;
+
+          return true;
+        });
+
         $('#menu-loading').hide();
         rows.forEach(function(row) {
           addLink(dataSource.id, row);
@@ -720,6 +736,7 @@
 
         // Update link label in case it was changed by the user
         menuItem.data.linkLabel = $('[data-id="' + menuItem.id + '"]').find('.link-label').val();
+        menuItem.data.entryId = menuItem.id;
         menuDataEntries.push(menuItem.data);
       }
     });
