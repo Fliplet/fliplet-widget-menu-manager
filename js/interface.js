@@ -662,19 +662,20 @@
 
         rows = Fliplet.Utils.sortBy(rows, 'data.order');
 
-        // Deduplicate rows by page ID to fix corrupted menu data
-        var seenPages = {};
+        // Remove stale master page references that should have been replaced by production pages
+        var appPages = Fliplet.Env.get('appPages') || [];
+        var masterPageIds = {};
+
+        appPages.forEach(function(p) {
+          if (p.masterPageId) {
+            masterPageIds[p.masterPageId] = true;
+          }
+        });
 
         rows = rows.filter(function(row) {
           var pageId = row.data && row.data.action && row.data.action.page;
 
-          if (!pageId) return true;
-
-          if (seenPages[pageId]) return false;
-
-          seenPages[pageId] = true;
-
-          return true;
+          return !pageId || !masterPageIds[pageId];
         });
 
         $('#menu-loading').hide();
