@@ -675,7 +675,7 @@
         rows = rows.filter(function(row) {
           var pageId = row.data && row.data.action && row.data.action.page;
 
-          return !pageId || !masterPageIds[pageId];
+          return !(pageId && masterPageIds[pageId]);
         });
 
         $('#menu-loading').hide();
