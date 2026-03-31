@@ -661,6 +661,23 @@
         }
 
         rows = Fliplet.Utils.sortBy(rows, 'data.order');
+
+        // Remove stale master page references that should have been replaced by production pages
+        var appPages = Fliplet.Env.get('appPages') || [];
+        var masterPageIds = {};
+
+        appPages.forEach(function(p) {
+          if (p.masterPageId) {
+            masterPageIds[p.masterPageId] = true;
+          }
+        });
+
+        rows = rows.filter(function(row) {
+          var pageId = row.data && row.data.action && row.data.action.page;
+
+          return !(pageId && masterPageIds[pageId]);
+        });
+
         $('#menu-loading').hide();
         rows.forEach(function(row) {
           addLink(dataSource.id, row);
@@ -720,6 +737,7 @@
 
         // Update link label in case it was changed by the user
         menuItem.data.linkLabel = $('[data-id="' + menuItem.id + '"]').find('.link-label').val();
+        menuItem.data.entryId = menuItem.id;
         menuDataEntries.push(menuItem.data);
       }
     });
